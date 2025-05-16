@@ -10,5 +10,9 @@
         public int Quantity { get; set; }
         // gia don vi cua san pham
         public decimal UnitPrice { get; set; }
+
+        //quan he
+        public Order Order { get; set; }
+        public Product Product { get; set; }
     }
 }

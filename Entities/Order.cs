@@ -12,9 +12,9 @@
         public string OrderCode { get; set; }
         // tong gia tri don hang
         public decimal TotalAmount { get; set; }
-        public string ShippingAdress { get; set; }
+        public string ShippingAddress { get; set; }
         //trang thai don hang
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
