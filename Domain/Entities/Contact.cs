@@ -1,4 +1,4 @@
-﻿namespace BackEndForFashion.Entities
+﻿namespace BackEndForFashion.Domain.Entities
 {
     public class Contact
     {

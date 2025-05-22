@@ -1,13 +1,13 @@
-﻿namespace BackEndForFashion.Entities
+﻿namespace BackEndForFashion.Domain.Entities
 {
     public class Product
     {
         public Guid Id { get; set; }
         public string ProductName { get; set; }
-        public string Description { get; set; } 
+        public string Description { get; set; }
         public decimal Price { get; set; }
         //so luong ton kho
-        public int Stock {  get; set; }
+        public int Stock { get; set; }
         //San pham noi bat
         public bool IsFeatured { get; set; }
         //san pham pho bien

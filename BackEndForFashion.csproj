@@ -17,11 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Model\" />
-    <Folder Include="Helper\" />
-    <Folder Include="DTOs\" />
-    <Folder Include="Services\" />
+    <Folder Include="Api\Controllers\" />
+    <Folder Include="Application\Interfaces\" />
+    <Folder Include="Application\ViewModels\" />
+    <Folder Include="Infrastructure\Repositories\" />
+    <Folder Include="Api\" />
+    <Folder Include="Application\Services\" />
   </ItemGroup>
 
 </Project>

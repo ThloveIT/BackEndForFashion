@@ -1,8 +1,8 @@
-﻿namespace BackEndForFashion.Entities
+﻿namespace BackEndForFashion.Domain.Entities
 {
     public class ProductFavorite
     {
-        
+
         // thoi gian them san pham vao danh sach yeu thich
         public DateTime AddedAt { get; set; }
 

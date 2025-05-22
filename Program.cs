@@ -1,4 +1,4 @@
-using BackEndForFashion.Data;
+using BackEndForFashion.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

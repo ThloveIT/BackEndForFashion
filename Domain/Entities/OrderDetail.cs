@@ -1,4 +1,4 @@
-﻿namespace BackEndForFashion.Entities
+﻿namespace BackEndForFashion.Domain.Entities
 {
     //chi tiet don hang(cac san pham trong don hang)
     public class OrderDetail

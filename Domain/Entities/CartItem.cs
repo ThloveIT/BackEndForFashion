@@ -1,4 +1,4 @@
-﻿namespace BackEndForFashion.Entities
+﻿namespace BackEndForFashion.Domain.Entities
 {
     //Luu cac muc torng gio hang
     public class CartItem
