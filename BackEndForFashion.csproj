@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Api\Controllers\" />
-    <Folder Include="Application\Interfaces\" />
     <Folder Include="Api\" />
     <Folder Include="Application\Services\" />
   </ItemGroup>
