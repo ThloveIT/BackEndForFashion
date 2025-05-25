@@ -1,4 +1,5 @@
-﻿using BackEndForFashion.Domain.Entities;
+﻿using BackEndForFashion.Application.ViewModels;
+using BackEndForFashion.Domain.Entities;
 
 namespace BackEndForFashion.Domain.Interfaces
 {
@@ -9,5 +10,6 @@ namespace BackEndForFashion.Domain.Interfaces
         Task<IEnumerable<Product>> GetFeaturedAsync();
         Task<IEnumerable<Product>> GetPopularAsync();
         Task<IEnumerable<Product>> GetNewAsync();
+        Task AddAsync(ProductVM model);
     }
 }

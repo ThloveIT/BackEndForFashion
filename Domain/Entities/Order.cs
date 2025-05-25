@@ -1,8 +1,23 @@
-﻿namespace BackEndForFashion.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BackEndForFashion.Domain.Entities
 {
     public enum Status
     {
-        Pending = 0, Confirmed = 1, Shipped = 2, Delivered = 3, Cancelled = -1
+        [Display(Name = "Đã hủy")]
+        Cancelled = -1,
+
+        [Display(Name = "Chờ xác nhận")]
+        Pending = 0,
+
+        [Display(Name = "Đã xác nhận")]
+        Confirmed = 1,
+
+        [Display(Name = "Đang vận chuyển")]
+        Shipped = 2,
+
+        [Display(Name = "Đã giao hàng")]
+        Delivered = 3
     }
     //luu thong tin don hang cua nguoi dung
     public class Order

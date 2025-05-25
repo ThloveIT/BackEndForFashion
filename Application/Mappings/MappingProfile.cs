@@ -39,7 +39,10 @@ namespace BackEndForFashion.Application.Mappings
                 .ForMember(dest => dest.ArticleCategoryName, otp => otp
                 .MapFrom(src => src.ArticleCategory.ArticleCategoryName));
 
-            CreateMap<Order, OrderVM>();
+            CreateMap<Order, OrderVM>()
+                .ForMember(dest => dest.Status, otp => otp.
+                MapFrom(src => src.Status.ToString()));
+            CreateMap<OrderVM, Order>();
             CreateMap<OrderDetail, OrderDetailVM>()
                 .ForMember(dest => dest.ProductName, opt => opt
                 .MapFrom(src => src.Product.ProductName)); ;

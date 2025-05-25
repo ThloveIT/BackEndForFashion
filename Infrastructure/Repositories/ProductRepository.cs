@@ -1,4 +1,5 @@
-﻿using BackEndForFashion.Domain.Entities;
+﻿using BackEndForFashion.Application.ViewModels;
+using BackEndForFashion.Domain.Entities;
 using BackEndForFashion.Domain.Interfaces;
 using BackEndForFashion.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

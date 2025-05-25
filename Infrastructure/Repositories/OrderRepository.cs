@@ -11,6 +11,11 @@ namespace BackEndForFashion.Infrastructure.Repositories
         {
         }
 
+        public async Task<Order> GetByUserIdAndOrderIdAsync(Guid UserId, Guid OrderId)
+        {
+            return await _context.Orders.FirstOrDefaultAsync(o => o.Id == OrderId && o.UserId == UserId);
+        }
+
         public async Task<IEnumerable<Order>> GetByUserIdAsync(Guid UserId)
         {
             return await _context.Orders
