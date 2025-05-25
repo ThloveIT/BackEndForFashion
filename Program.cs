@@ -1,3 +1,5 @@
+using BackEndForFashion.Application.Interfaces;
+using BackEndForFashion.Application.Mappings;
 using BackEndForFashion.Domain.Interfaces;
 using BackEndForFashion.Infrastructure.Data;
 using BackEndForFashion.Infrastructure.Repositories;
@@ -33,6 +35,9 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IAboutRepository, AboutRepository>();
 
+
+// Configure AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

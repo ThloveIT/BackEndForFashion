@@ -11,7 +11,7 @@ namespace BackEndForFashion.Application.Interfaces
 
         //admin only
         Task<CategoryVM> CreateAsync(CategoryVM model);
-        Task UpdateAsync(Guid Id,CategoryVM model);
+        Task UpdateAsync(CategoryVM model);
         Task DeleteAsync(Guid Id);
     }
 }
