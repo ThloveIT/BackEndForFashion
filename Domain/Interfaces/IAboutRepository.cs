@@ -2,7 +2,7 @@
 
 namespace BackEndForFashion.Domain.Interfaces
 {
-    public interface IAboutRepository
+    public interface IAboutRepository : IRepository<About>
     {
         Task<About> GetLastestAsync();
     }

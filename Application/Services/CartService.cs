@@ -22,6 +22,7 @@ namespace BackEndForFashion.Application.Services
         }
         public async Task AddItemAsync(Guid UserId, CartItemVM item)
         {
+            //Kiem tra xem nguoi dung co gio hang chua
             var cart = await _cartRepository.GetActiveCartByUserIdAsync(UserId);
             if (cart == null)
             {
@@ -31,39 +32,70 @@ namespace BackEndForFashion.Application.Services
                     UserId = UserId,
                     CreatedAt = DateTime.UtcNow,
                 };
+                // Them gio hang moi vao CSDL
                 await _cartRepository.AddAsync(cart);
             }
 
-            var existingItem = await _cartItemRepository.GetByCartAndProductAsync(cart.Id, item.ProductId);
-            if (existingItem != null)
+            //Kiem tra xem san pham exisgingItem co trong Item khong
+            var exisgingItem = await _cartItemRepository.GetByCartAndProductAsync(cart.Id, item.ProductId);
+            //neu san pham co trong gio hang
+            if(exisgingItem !=  null)
             {
-                existingItem.Quantity += item.Quantity;
-                await _cartItemRepository.UpdateAsync(existingItem);
+                //tang so luong san pham
+                exisgingItem.Quantity += item.Quantity;
+                //Cap nhat lai item
+                await _cartItemRepository.UpdateAsync(exisgingItem);
             }
+            //Neu san pham khong co trong gio hang
             else
             {
+                //kiem tra xem co trong csdl khong
                 var product = await _productRepository.GetByIdAsync(item.ProductId);
-                if (product == null) throw new Exception("Sản phẩm không thấy");
-
+                if(product == null)
+                {
+                    throw new Exception("San pham nay khong ton tai");
+                }
+                // tao item moi
                 var cartItem = new CartItem
                 {
-                    Id= Guid.NewGuid(),
+                    Id = Guid.NewGuid(),
                     CartId = cart.Id,
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
                 };
+                //them cartItem vao CSDL
                 await _cartItemRepository.AddAsync(cartItem);
             }
         }
 
-        public Task<CartVM> GetActiveCartAsync(Guid UserId)
+        //Tao gio hang cho user
+        public async Task<CartVM> GetActiveCartAsync(Guid UserId)
         {
-            throw new NotImplementedException();
+            var cart = await _cartRepository.GetActiveCartByUserIdAsync(UserId);
+            if(cart == null)
+            {
+                cart = new Cart
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = UserId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                await _cartRepository.AddAsync(cart);
+            }
+            return _mapper.Map<CartVM>(cart);
         }
 
-        public Task RemoveItemAsync(Guid UserId, Guid ProductId)
+        public async Task RemoveItemAsync(Guid UserId, Guid ProductId)
         {
-            throw new NotImplementedException();
+            // Kiem tra co gio hang khong
+            var cart = await _cartRepository.GetActiveCartByUserIdAsync(UserId);
+            if (cart == null) return;
+            //Kiem tra item co trong gio hang khong
+            var item = await _cartItemRepository.GetByCartAndProductAsync(cart.Id, ProductId);
+            if(item != null)
+            {
+                await _cartItemRepository.DeleteAsync(item.Id);
+            }
         }
     }
 }

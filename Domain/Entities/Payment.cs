@@ -1,5 +1,19 @@
 ﻿namespace BackEndForFashion.Domain.Entities
 {
+    public enum PaymentMethod
+    {
+        Online = 0,
+        COD = 1,
+    }
+    public enum PaymentStatus
+    {
+        //Cho thanh toan
+        Pending = 0,
+        //Da thanh toan
+        Completed = 1,
+        //Thanh toan that bai
+        Failed = -1
+    }
     public class Payment
     {
         public Guid Id { get; set; }
@@ -7,8 +21,8 @@
         //so tien thanh toan
         public decimal Amount { get; set; }
         //phuong thuc thanh toan
-        public string PaymentMethod { get; set; }
-        public string Status { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentStatus Status { get; set; }
         //thoi gian thuc hien thanh toan
         public DateTime CreatedAt { get; set; }
 
