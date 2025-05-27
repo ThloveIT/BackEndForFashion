@@ -27,10 +27,16 @@ namespace BackEndForFashion.Infrastructure.Repositories
 
         public async Task<IEnumerable<Product>> GetNewAsync()
         {
+            var now = DateTime.UtcNow;
+            var recentDays = 7;
+
+            //Lay theo thuoc tinh IsNew hoac san pham update trong vong 7 ngay gan nhat
             return await _context.Products
-                .Where(p=>p.IsNew)
+                .Where(p=>p.IsNew || p.CreatedAt >= now.AddDays(-recentDays))
                 .Include(p=>p.Category)
                 .Include(p=>p.ProductImages)
+                .OrderByDescending(p=>p.CreatedAt)
+                .Take(10)  // Lay 10 san pham
                 .ToListAsync ();
         }
 
@@ -40,6 +46,7 @@ namespace BackEndForFashion.Infrastructure.Repositories
                 .Where(p => p.IsPopular)
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
+                .Take(10)
                 .ToListAsync();
         }
 
