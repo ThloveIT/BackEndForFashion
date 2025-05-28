@@ -22,6 +22,10 @@ namespace BackEndForFashion.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]RegisterVM model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var user = await _userService.RegisterAsync(model);
@@ -29,8 +33,16 @@ namespace BackEndForFashion.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return BadRequest(ex.Message);
             }
+        }
+
+        [Authorize(Roles ="Admin")]
+        [HttpPost("register-admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody]RegisterVM model)
+        {
+            var user = await _userService.RegisterAsync(model, "Admin");
+            return Ok(user);
         }
 
         //Dang nhap

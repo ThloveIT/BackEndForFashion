@@ -79,10 +79,17 @@ namespace BackEndForFashion.Application.Services
                     Id = Guid.NewGuid(),
                     UserId = UserId,
                     CreatedAt = DateTime.UtcNow,
+                    CartItems = new List<CartItem>()
                 };
                 await _cartRepository.AddAsync(cart);
+                cart = await _cartRepository.GetActiveCartByUserIdAsync(UserId);
             }
-            return _mapper.Map<CartVM>(cart);
+            var cartVM = _mapper.Map<CartVM>(cart); 
+            if(cartVM == null)
+            {
+                throw new InvalidOperationException("Failed to map Cart to CartViewModel.");
+            }
+            return cartVM;
         }
 
         public async Task RemoveItemAsync(Guid UserId, Guid ProductId)

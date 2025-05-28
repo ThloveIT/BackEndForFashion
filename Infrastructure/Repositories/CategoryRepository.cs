@@ -20,6 +20,11 @@ namespace BackEndForFashion.Infrastructure.Repositories
 
         public async Task<IEnumerable<Category>> GetSubCategoriesAsync(Guid ParentId)
         {
+            var parentExists = await _context.Categories.AnyAsync(c=>c.Id == ParentId);
+            if (!parentExists)
+            {
+                throw new KeyNotFoundException($"Parent category with ID {ParentId} not found.");
+            }
             return await _context.Categories
                 .Where(c => c.ParentId == ParentId)
                 .Include(c => c.Parent)

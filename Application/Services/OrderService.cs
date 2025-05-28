@@ -3,18 +3,21 @@ using BackEndForFashion.Application.Interfaces;
 using BackEndForFashion.Application.ViewModels;
 using BackEndForFashion.Domain.Entities;
 using BackEndForFashion.Domain.Interfaces;
+using BackEndForFashion.Infrastructure.Data;
 
 namespace BackEndForFashion.Application.Services
 {
     public class OrderService : IOrderService
     {
+        private readonly MyDbContext _context;
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
 
-        public OrderService(IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, IMapper mapper, IProductRepository productRepository)
+        public OrderService(IOrderRepository orderRepository, IOrderDetailRepository orderDetailRepository, IMapper mapper, IProductRepository productRepository, MyDbContext context)
         {
+            _context = context;
             _orderRepository = orderRepository;
             _orderDetailRepository = orderDetailRepository;
             _mapper = mapper;
@@ -40,43 +43,54 @@ namespace BackEndForFashion.Application.Services
 
         public async Task<OrderVM> CreateAsync(OrderVM model, Guid UserId)
         {
-            //Tao don hang moi
-            var order = new Order
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                Id = Guid.NewGuid(),
-                UserId = UserId,
-                OrderCode = $"MDH-{DateTime.UtcNow.Ticks}",
-                TotalAmount = model.TotalAmount,
-                ShippingAddress = model.ShippingAddress,
-                Status = Enum.Parse<Status>(model.Status),
-                CreatedAt = DateTime.UtcNow,
-            };
-            //Tao chi tiet don hang
-            var orderDetails = new List<OrderDetail>();
-            foreach(var detail in model.OrderDetails)
-            {
-                var product = await _productRepository.GetByIdAsync(detail.ProductId);
-                if(product == null || product.Stock < detail.Quantity)
+                //Tao don hang moi
+                var order = new Order
                 {
-                    throw new Exception($"Sản phẩm {detail.ProductName} đã hết hàng");
+                    Id = Guid.NewGuid(),
+                    UserId = UserId,
+                    OrderCode = $"MDH-{DateTime.UtcNow.Ticks}",
+                    TotalAmount = model.TotalAmount,
+                    ShippingAddress = model.ShippingAddress,
+                    Status = Enum.Parse<Status>(model.Status),
+                    CreatedAt = DateTime.UtcNow,
+                };
+                //Tao chi tiet don hang
+                var orderDetails = new List<OrderDetail>();
+                foreach (var detail in model.OrderDetails)
+                {
+                    var product = await _productRepository.GetByIdAsync(detail.ProductId);
+                    if (product == null || product.Stock < detail.Quantity)
+                    {
+                        throw new Exception($"Sản phẩm {detail.ProductName} đã hết hàng");
+                    }
+
+                    product.Stock -= detail.Quantity;
+                    await _productRepository.UpdateAsync(product);
+
+                    orderDetails.Add(new OrderDetail
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderId = order.Id,
+                        ProductId = detail.ProductId,
+                        Quantity = detail.Quantity,
+                        UnitPrice = product.Price,
+                    });
                 }
 
-                orderDetails.Add(new OrderDetail
-                {
-                    Id = Guid.NewGuid() ,
-                    OrderId = order.Id,
-                    ProductId = detail.ProductId,
-                    Quantity = detail.Quantity,
-                    UnitPrice = product.Price,
-                });
+                order.OrderDetails = orderDetails;
+                await _orderRepository.AddAsync(order);
 
-                product.Stock -= detail.Quantity;
-                await _productRepository.UpdateAsync(product);
+                await transaction.CommitAsync();
+                return _mapper.Map<OrderVM>(order);
             }
-
-            order.OrderDetails = orderDetails;
-            await _orderRepository.AddAsync(order);
-            return _mapper.Map<OrderVM>(order);
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<OrderVM> GetByIdAsync(Guid Id)

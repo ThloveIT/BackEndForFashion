@@ -22,11 +22,12 @@ namespace BackEndForFashion.Infrastructure.Repositories
         public async Task DeleteAsync(Guid Id)
         {
             var entity = await GetByIdAsync(Id);
-            if (entity != null)
+            if (entity == null)
             {
-                _context.Set<T>().Remove(entity);
-                await _context.SaveChangesAsync();
+                throw new KeyNotFoundException($"Entity with ID {Id} not found.");
             }
+            _context.Set<T>().Remove(entity);
+            await _context.SaveChangesAsync();  
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()

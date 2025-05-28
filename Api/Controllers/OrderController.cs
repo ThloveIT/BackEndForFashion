@@ -26,7 +26,11 @@ namespace BackEndForFashion.Api.Controllers
         {
             try
             {
-                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if(string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+                {
+                    return Unauthorized(new { Message = "Invalid or missing user ID in token." });
+                }
                 var createdOrder = await _orderService.CreateAsync(model, userId);
                 return CreatedAtAction(nameof(GetById), new {id = createdOrder.Id}, createdOrder );
             }
