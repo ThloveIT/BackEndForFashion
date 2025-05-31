@@ -21,7 +21,10 @@ namespace BackEndForFashion.Application.Services
             //tao moi mot category
             var category = _mapper.Map<Category>(model);
             category.Id = Guid.NewGuid();
+            category.IsActive = true;
             await _categoryRepository.AddAsync(category);
+
+            var addedCategory = await _categoryRepository.GetByIdWithParentAsync(category.Id);
             return _mapper.Map<CategoryVM>(category);
         }
 

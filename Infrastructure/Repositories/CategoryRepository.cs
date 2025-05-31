@@ -11,6 +11,13 @@ namespace BackEndForFashion.Infrastructure.Repositories
         {
         }
 
+        public async Task<Category> GetByIdWithParentAsync(Guid id)
+        {
+            return await _context.Categories
+                .Include(c=>c.Parent)
+                .FirstOrDefaultAsync(c=>c.Id == id);
+        }
+
         public async Task<IEnumerable<Category>> GetRootCategoriesAsync()
         {
             return await _context.Categories.Where(c=>c.ParentId == null)

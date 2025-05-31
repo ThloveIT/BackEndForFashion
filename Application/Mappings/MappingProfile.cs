@@ -19,8 +19,13 @@ namespace BackEndForFashion.Application.Mappings
                 .ForMember(dest => dest.Role, opt => opt.Ignore());
 
             CreateMap<Category, CategoryVM>()
-                .ForMember(dest => dest.ParentName, otp => otp.MapFrom
-                (src => src.Parent != null ? src.Parent.CategoryName : null));
+                .ForMember(dest => dest.ParentName, otp => otp.MapFrom(src => src.Parent != null ? src.Parent.CategoryName : null));
+
+            CreateMap<CategoryVM, Category>()
+                .ForMember(dest => dest.ParentId, otp => otp.MapFrom(src => src.ParentId))
+                .ForMember(dest => dest.Parent, otp => otp.Ignore())
+                .ForMember(dest => dest.Products, otp => otp.Ignore())
+                .ForMember(dest => dest.SubCategories, otp => otp.Ignore());
 
             CreateMap<Product, ProductVM>()
                 .ForMember(dest => dest.CategoryName, otp => otp.MapFrom

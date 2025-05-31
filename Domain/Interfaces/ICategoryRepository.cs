@@ -6,5 +6,6 @@ namespace BackEndForFashion.Domain.Interfaces
     {
         Task<IEnumerable<Category>> GetSubCategoriesAsync(Guid ParentId);
         Task<IEnumerable<Category>> GetRootCategoriesAsync();
+        Task<Category> GetByIdWithParentAsync(Guid id); 
     }
 }

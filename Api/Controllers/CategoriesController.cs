@@ -24,6 +24,16 @@ namespace BackEndForFashion.Api.Controllers
             return Ok(category);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var category = await _categoryService.GetByIdAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
+        }
         [HttpGet("subcategories/{parentId}")]
         public async Task<IActionResult> GetSubCategories(Guid parentId)
         {
@@ -42,8 +52,12 @@ namespace BackEndForFashion.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody]CategoryVM model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var category = await _categoryService.CreateAsync(model);
-            return CreatedAtAction(nameof(GetAll), new { id = category.Id }, category);
+            return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
         }
 
         [Authorize(Roles = "Admin")]

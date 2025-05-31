@@ -89,7 +89,7 @@ namespace BackEndForFashion.Api.Controllers
         }
         //Admin cap nhat san pham
         [Authorize(Roles = "Admin")]
-        [HttpPost("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody]ProductVM model)
         {
             await _productService.UpdateAsync(id, model);

@@ -54,6 +54,36 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IAboutService, AboutService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+// Thêm Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "BackEndForFashion", Version = "v1" });
+
+    // C?u h?nh ð? h? tr? JWT Authentication trong Swagger
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Please enter JWT with Bearer into field",
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 //Configure Identity
 builder.Services.AddScoped<IPasswordHasher<User>, 
 PasswordHasher<User>>();
@@ -87,8 +117,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
-        .AllowAnyMethod()
-        .AllowAnyHeader();
+        .WithMethods("GET", "POST", "PUT", "DELETE")
+        .WithHeaders("Authorization", "Content-Type")
+        .AllowCredentials();
     });
 });
 

@@ -22,6 +22,15 @@ namespace BackEndForFashion.Application.Services
             _mapper = mapper;
             _passwordHasher = passwordHasher;
         }
+
+        public async Task<bool> DeleteUserAsync(Guid Id)
+        {
+            var user = await _userRepository.GetByIdAsync(Id);
+            if (user == null) return false;
+            await _userRepository.DeleteAsync(Id);
+            return true;
+        }
+
         public async Task<IEnumerable<UserVM>> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
@@ -56,6 +65,11 @@ namespace BackEndForFashion.Application.Services
                 }
             }
             return _jwtService.GenerateToken(user);
+        }
+
+        public async Task<UserVM> RegisterAdminAsync(RegisterVM model)
+        {
+            return await RegisterAsync(model, "Admin");
         }
 
         public async Task<UserVM> RegisterAsync(RegisterVM model, string Role = "User")

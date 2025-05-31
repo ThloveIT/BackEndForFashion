@@ -1,5 +1,6 @@
 ﻿using BackEndForFashion.Application.Interfaces;
 using BackEndForFashion.Application.ViewModels;
+using BackEndForFashion.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,8 +42,19 @@ namespace BackEndForFashion.Api.Controllers
         [HttpPost("register-admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody]RegisterVM model)
         {
-            var user = await _userService.RegisterAsync(model, "Admin");
-            return Ok(user);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var user = await _userService.RegisterAdminAsync(model);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         //Dang nhap
@@ -75,6 +87,25 @@ namespace BackEndForFashion.Api.Controllers
         {
             var users = await _userService.GetAllAsync();
             return Ok(users);
+        }
+
+        //Xoa nguoi dung 
+        [Authorize(Roles ="Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            if(id == userId)
+            {
+                return BadRequest("Bạn không thể xóa tài khoản của mình");
+            }
+
+            var result = await _userService.DeleteUserAsync(id);
+            if (!result)
+            {
+                return NotFound("User không tồn tại hoặc đã bị xóa.");
+            }
+            return Ok("Bạn đã xóa user thành công");
         }
     }
 }
