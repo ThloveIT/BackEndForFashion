@@ -1,4 +1,5 @@
 ﻿using BackEndForFashion.Application.ViewModels;
+using BackEndForFashion.Domain.Entities;
 
 namespace BackEndForFashion.Application.Interfaces
 {
@@ -14,5 +15,7 @@ namespace BackEndForFashion.Application.Interfaces
         //Task UpdateAsync(Guid Id, string Status);
         //User huy don hang
         Task CancelAsync(Guid OrderId, Guid UserId);
+        Task<IEnumerable<OrderVM>> GetAllOrderAsync();
+        Task<OrderVM> UpdateAsync(Guid id, OrderVM model);
     }
 }

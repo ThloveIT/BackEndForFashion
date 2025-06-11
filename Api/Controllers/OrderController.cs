@@ -10,7 +10,6 @@ namespace BackEndForFashion.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -61,6 +60,39 @@ namespace BackEndForFashion.Api.Controllers
             var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var orders = await _orderService.GetByUserIdAsync(userId);
             return Ok(orders);
+        }
+
+        //Lay tat ca don hang danh cho admin
+        [Authorize(Roles = "Admin")]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            try
+            {
+                var orders = await _orderService.GetAllOrderAsync();
+                return Ok(orders);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        //Cap nhat don hang danh cho Admin
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] OrderVM model)
+        {
+            try
+            {
+                var updatedOrder = await _orderService.UpdateAsync(id, model);
+                return Ok(updatedOrder);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
 
     }

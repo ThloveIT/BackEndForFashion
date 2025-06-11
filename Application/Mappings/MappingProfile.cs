@@ -44,6 +44,13 @@ namespace BackEndForFashion.Application.Mappings
                 .ForMember(dest => dest.ArticleCategoryName, otp => otp
                 .MapFrom(src => src.ArticleCategory.ArticleCategoryName));
 
+            //mới thêm
+            CreateMap<ArticleVM, Article>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ReverseMap();
+
             CreateMap<Order, OrderVM>()
                 .ForMember(dest => dest.Status, otp => otp.
                 MapFrom(src => src.Status.ToString()));

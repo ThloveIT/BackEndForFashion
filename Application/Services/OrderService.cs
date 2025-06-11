@@ -93,6 +93,12 @@ namespace BackEndForFashion.Application.Services
             }
         }
 
+        public async Task<IEnumerable<OrderVM>> GetAllOrderAsync()
+        {
+            var orders = await _orderRepository.GetAllOrderAsync();
+            return _mapper.Map<IEnumerable<OrderVM>>(orders);
+        }
+
         public async Task<OrderVM> GetByIdAsync(Guid Id)
         {
             var order = await _orderRepository.GetByIdAsync(Id);
@@ -104,6 +110,65 @@ namespace BackEndForFashion.Application.Services
         {
             var order = await _orderRepository.GetByUserIdAsync(UserId);
             return _mapper.Map<IEnumerable<OrderVM>>(order);
+        }
+
+        public async Task<OrderVM> UpdateAsync(Guid id, OrderVM model)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var existingOrder = await _orderRepository.GetByIdAsync(id);
+                if (existingOrder == null)
+                {
+                    throw new Exception("Đơn hàng không tồn tại.");
+                }
+
+                existingOrder.OrderCode = model.OrderCode ?? existingOrder.OrderCode;
+                existingOrder.TotalAmount = model.TotalAmount;
+                existingOrder.ShippingAddress = model.ShippingAddress ?? existingOrder.ShippingAddress;
+                existingOrder.Status = string.IsNullOrEmpty(model.Status)
+                    ? existingOrder.Status
+                    : Enum.Parse<Status>(model.Status);
+                existingOrder.UpdatedAt = DateTime.UtcNow;
+
+                if (model.OrderDetails != null && model.OrderDetails.Any())
+                {
+                    var existingDetails = existingOrder.OrderDetails.ToList();
+                    foreach (var detail in existingDetails)
+                    {
+                        await _orderDetailRepository.DeleteAsync(detail.Id);
+                    }
+
+                    var newDetails = new List<OrderDetail>();
+                    foreach (var detail in model.OrderDetails)
+                    {
+                        var product = await _productRepository.GetByIdAsync(detail.ProductId);
+                        if (product == null)
+                        {
+                            throw new Exception($"Sản phẩm với ID {detail.ProductId} không tồn tại.");
+                        }
+
+                        newDetails.Add(new OrderDetail
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderId = id,
+                            ProductId = detail.ProductId,
+                            Quantity = detail.Quantity,
+                            UnitPrice = product.Price,
+                        });
+                    }
+                    existingOrder.OrderDetails = newDetails;
+                }
+
+                await _orderRepository.UpdateAsync(existingOrder);
+                await transaction.CommitAsync();
+                return _mapper.Map<OrderVM>(existingOrder);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

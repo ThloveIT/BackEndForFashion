@@ -12,5 +12,6 @@ namespace BackEndForFashion.Application.Interfaces
         Task<UserVM> GetByIdAsync(Guid Id);
         Task<IEnumerable<UserVM>> GetAllAsync(); //Admin only
         Task<bool> DeleteUserAsync(Guid Id);
+        Task<UserVM> UpdateAsync(UpdateUserVM model);
     }
 }

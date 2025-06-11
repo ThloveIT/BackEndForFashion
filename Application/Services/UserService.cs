@@ -3,6 +3,7 @@ using BackEndForFashion.Application.Interfaces;
 using BackEndForFashion.Application.ViewModels;
 using BackEndForFashion.Domain.Entities;
 using BackEndForFashion.Domain.Interfaces;
+using BackEndForFashion.Infrastructure.Repositories;
 using BackEndForFashion.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 
@@ -93,6 +94,29 @@ namespace BackEndForFashion.Application.Services
             user.PasswordHash = _passwordHasher.HashPassword(user, model.Password);
 
             await _userRepository.AddAsync(user);
+            return _mapper.Map<UserVM>(user);
+        }
+
+        public async Task<UserVM> UpdateAsync(UpdateUserVM model)
+        {
+            var user = await _userRepository.GetByIdAsync(model.Id);
+            if (user == null)
+            {
+                throw new Exception("Không tìm thấy người dùng.");
+            }
+
+            // Gán các trường được phép cập nhật
+            user.UserName = model.UserName;
+            user.Email = model.Email;
+            user.FullName = model.FullName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = model.Address;
+            user.UpdatedAt = DateTime.UtcNow;
+            user.Role = "User"; // Đảm bảo không bị thay đổi role trái phép
+
+            await _userRepository.UpdateAsync(user);
+
+            // Trả về UserVM nếu cần
             return _mapper.Map<UserVM>(user);
         }
     }

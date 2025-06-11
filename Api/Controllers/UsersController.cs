@@ -107,5 +107,41 @@ namespace BackEndForFashion.Api.Controllers
             }
             return Ok("Bạn đã xóa user thành công");
         }
+
+        //cap nhat thong tin nguoi dung
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Lấy userId từ token của người đăng nhập hiện tại
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                if(userId == Guid.Empty)
+                {
+                    return BadRequest(new { message = "Không tìm thấy thông tin người dùng." });
+                }
+                model.Id = userId; // Đảm bảo không ai chỉnh sửa ID
+
+                // Gọi service để cập nhật
+                var updatedUser = await _userService.UpdateAsync(model);
+                if (updatedUser == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy người dùng để cập nhật." });
+                }
+                return Ok(new { statusCode = 200, message = "Cập nhật thông tin thành công", data = updatedUser }); // Có thể trả về thông tin mới cập nhật
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
     }
 }

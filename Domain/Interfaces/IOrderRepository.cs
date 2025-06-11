@@ -6,5 +6,6 @@ namespace BackEndForFashion.Domain.Interfaces
     {
         Task<IEnumerable<Order>> GetByUserIdAsync(Guid UserId);
         Task<Order> GetByUserIdAndOrderIdAsync(Guid UserId, Guid OrderId);
+        Task<IEnumerable<Order>> GetAllOrderAsync();
     }
 }

@@ -12,7 +12,7 @@
         public bool IsActive { get; set; }
 
         //quan he
-        public Guid ArticleCategoryId { get; set; }
+        public Guid? ArticleCategoryId { get; set; }
         public ArticleCategory ArticleCategory { get; set; }
 
     }

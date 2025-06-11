@@ -11,6 +11,15 @@ namespace BackEndForFashion.Infrastructure.Repositories
         {
         }
 
+        public async Task<IEnumerable<Order>> GetAllOrderAsync()
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(o => o.Product)
+                .Include(o => o.Payment)
+                .ToListAsync();
+        }
+
         public async Task<Order> GetByUserIdAndOrderIdAsync(Guid UserId, Guid OrderId)
         {
             return await _context.Orders.FirstOrDefaultAsync(o => o.Id == OrderId && o.UserId == UserId);

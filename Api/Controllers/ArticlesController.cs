@@ -44,6 +44,10 @@ namespace BackEndForFashion.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody]ArticleVM model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var article = await _articleService.CreateAsync(model);
@@ -71,5 +75,19 @@ namespace BackEndForFashion.Api.Controllers
             return NoContent();
         }
 
+        // Lấy tất cả bài viết
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var articles = await _articleService.GetAllAsync();
+                return Ok(articles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi khi lấy danh sách bài viết: {ex.Message}");
+            }
+        }
     }
 }
