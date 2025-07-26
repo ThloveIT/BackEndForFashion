@@ -235,6 +235,18 @@ namespace BackEndForFashion.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -314,11 +326,9 @@ namespace BackEndForFashion.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("PaymentMethod")
-                        .HasMaxLength(50)
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
-                        .HasMaxLength(500)
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -335,7 +345,7 @@ namespace BackEndForFashion.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid?>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -345,6 +355,9 @@ namespace BackEndForFashion.Migrations
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal?>("Discount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -596,8 +609,7 @@ namespace BackEndForFashion.Migrations
                     b.HasOne("BackEndForFashion.Domain.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
                 });

@@ -1,11 +1,13 @@
-﻿namespace BackEndForFashion.Application.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BackEndForFashion.Application.ViewModels
 {
     public class CartItemVM
     {
+        [Required]
         public Guid ProductId { get; set; }
-        public string ProductName { get; set; }
-        public decimal Price { get; set; }
+        [Required]
         public int Quantity { get; set; }
-        public string ImageUrl { get; set; }
+
     }
 }

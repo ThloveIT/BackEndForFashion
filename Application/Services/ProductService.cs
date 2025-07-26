@@ -23,12 +23,25 @@ namespace BackEndForFashion.Application.Services
         {
             if (model == null)
             {
-                throw new ArgumentNullException("model");
+                throw new ArgumentNullException(nameof(model));
             }
             var product = _mapper.Map<Product>(model);
             product.Id = Guid.NewGuid();
-            product.CreatedAt = DateTime.UtcNow;
-            product.UpdatedAt = DateTime.UtcNow;
+            product.CreatedAt = model.CreatedAt;
+            product.UpdatedAt = model.UpdatedAt;
+            product.IsActive = model.IsActive;
+
+            if(model.ProductImages != null)
+            {
+                product.ProductImages = model.ProductImages.Select(img => new ProductImage
+                {
+                    Id = img.Id,
+                    ImageUrl = img.ImageUrl,
+                    IsPrimary = img.IsPrimary,
+                    ProductId = product.Id
+                }).ToList();
+            }
+
             await _productRepository.AddAsync(product);
             return _mapper.Map<ProductVM>(product);
         }
@@ -53,7 +66,6 @@ namespace BackEndForFashion.Application.Services
         public async Task<ProductVM> GetByIdAsync(Guid Id)
         {
             var product = await _productRepository.GetByIdAsync(Id);
-            if (product == null) throw new ArgumentNullException("Không tìm thấy sản phẩm");
             return _mapper.Map<ProductVM>(product);
         }
 
@@ -90,7 +102,18 @@ namespace BackEndForFashion.Application.Services
             }
             //chuyen du lieu nguoi dung nhap model sang du lieu product
             _mapper.Map(model, product);
-            product.UpdatedAt = DateTime.UtcNow;
+            product.UpdatedAt = model.UpdatedAt;
+
+            if(model.ProductImages != null)
+            {
+                product.ProductImages = model.ProductImages.Select(img => new ProductImage
+                {
+                    Id = img.Id,
+                    ImageUrl = img.ImageUrl,
+                    IsPrimary = img.IsPrimary,
+                    ProductId = product.Id
+                }).ToList();
+            }
             await _productRepository.UpdateAsync(product);
         }
     }

@@ -16,6 +16,6 @@ namespace BackEndForFashion.Application.Interfaces
         //User huy don hang
         Task CancelAsync(Guid OrderId, Guid UserId);
         Task<IEnumerable<OrderVM>> GetAllOrderAsync();
-        Task<OrderVM> UpdateAsync(Guid id, OrderVM model);
+        Task<OrderVM> UpdateAsync(Guid id, UpdateOrderStatus model);
     }
 }

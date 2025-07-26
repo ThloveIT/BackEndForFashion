@@ -6,6 +6,7 @@
         public string ProductName { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public decimal? Discount { get; set; }
         //so luong ton kho
         public int Stock { get; set; }
         //San pham noi bat
@@ -19,7 +20,7 @@
         public bool IsActive { get; set; }
 
         //quan he
-        public Guid CategoryId { get; set; }
+        public Guid? CategoryId { get; set; }
         public Category Category { get; set; }
         public ICollection<ProductImage> ProductImages { get; set; }
         public ICollection<ProductFavorite> ProductFavorites { get; set; }

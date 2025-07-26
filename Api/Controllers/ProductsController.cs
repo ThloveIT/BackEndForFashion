@@ -11,10 +11,12 @@ namespace BackEndForFashion.Api.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IWebHostEnvironment _enviroment;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IWebHostEnvironment environment)
         {
             _productService = productService;
+            _enviroment = environment;
         }
         //Lay danh sach san pham
         [HttpGet]
@@ -24,26 +26,31 @@ namespace BackEndForFashion.Api.Controllers
             return Ok(products);
         }
 
-        //Lay san pham theo ID
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid Id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             try
             {
-                var product = await _productService.GetByIdAsync(Id);
+                Console.WriteLine($"Fetching product with ID: {id}");
+                var product = await _productService.GetByIdAsync(id);
+                if (product == null)
+                {
+                    return NotFound("Không tìm thấy sản phẩm");
+                }
                 return Ok(product);
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in GetById: {ex.Message} - {ex.StackTrace}");
                 return BadRequest(ex.Message);
             }
         }
 
         //Tim kiem san pham
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string keyword)
+        public async Task<IActionResult> Search([FromQuery] string query)
         {
-            var products = await _productService.SearchAsync(keyword);
+            var products = await _productService.SearchAsync(query);
             return Ok(products);
         }
 
@@ -82,18 +89,100 @@ namespace BackEndForFashion.Api.Controllers
         //Admin tao san pham moi
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProductVM model)
+        public async Task<IActionResult> Create([FromForm] ProductVM model, List<IFormFile> images)
         {
-            var product = await _productService.CreateAsync(model);
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            try
+            {
+                if(images != null && images.Any())
+                {
+                    model.ProductImages ??= new List<ProductImageVM>();
+                    foreach(var image in images)
+                    {
+                        var imageUrl = await SaveImage(image);
+                        model.ProductImages.Add(new ProductImageVM
+                        {
+                            Id = Guid.NewGuid(),
+                            ImageUrl = imageUrl,
+                            IsPrimary = model.ProductImages.Count == 0
+                        });
+                    }
+                }
+                else
+                {
+                    model.ProductImages = new List<ProductImageVM>();
+                }
+
+                model.CreatedAt = DateTime.UtcNow;
+                model.IsActive = true;
+
+                var product = await _productService.CreateAsync(model);
+                return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
+
+        private async Task<string> SaveImage(IFormFile file)
+        {
+            var uploadsFolder = Path.Combine(_enviroment.WebRootPath, "images/products");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            try
+            {
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                return $"/images/products/{fileName}";
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error saving image: {ex.Message}");
+                throw;
+            }
+        }
+
         //Admin cap nhat san pham
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody]ProductVM model)
+        public async Task<IActionResult> Update(Guid id, [FromForm]ProductVM model, List<IFormFile> images)
         {
-            await _productService.UpdateAsync(id, model);
-            return NoContent();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                if (images != null && images.Any())
+                {
+                    model.ProductImages = model.ProductImages ?? new List<ProductImageVM>();
+                    foreach (var image in images)
+                    {
+                        var imageUrl = await SaveImage(image);
+                        model.ProductImages.Add(new ProductImageVM
+                        {
+                            Id = Guid.NewGuid(),
+                            ImageUrl = imageUrl,
+                            IsPrimary = !model.ProductImages.Any(i => i.IsPrimary), // Đặt ảnh mới làm chính nếu chưa có
+                        });
+                    }
+                }
+
+                model.UpdatedAt = DateTime.UtcNow;
+                await _productService.UpdateAsync(id, model);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         //Admin xoa san pham
@@ -101,8 +190,15 @@ namespace BackEndForFashion.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _productService.DeleteAsync(id);
-            return NoContent();
+            try
+            {
+                await _productService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

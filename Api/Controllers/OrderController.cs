@@ -25,11 +25,13 @@ namespace BackEndForFashion.Api.Controllers
         {
             try
             {
+                //lay userId tu token de xac thuc
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if(string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 {
                     return Unauthorized(new { Message = "Invalid or missing user ID in token." });
                 }
+                //goi dich vu tao don hang
                 var createdOrder = await _orderService.CreateAsync(model, userId);
                 return CreatedAtAction(nameof(GetById), new {id = createdOrder.Id}, createdOrder );
             }
@@ -82,12 +84,27 @@ namespace BackEndForFashion.Api.Controllers
         //Cap nhat don hang danh cho Admin
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] OrderVM model)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateOrderStatus model)
         {
             try
             {
                 var updatedOrder = await _orderService.UpdateAsync(id, model);
                 return Ok(updatedOrder);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> Cancel(Guid id)
+        {
+            try
+            {
+                var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                await _orderService.CancelAsync(userId, id);
+                return Ok(new { Message = "Đơn hàng đã được hủy." });
             }
             catch (Exception ex)
             {

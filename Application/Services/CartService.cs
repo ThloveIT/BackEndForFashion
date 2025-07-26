@@ -37,14 +37,14 @@ namespace BackEndForFashion.Application.Services
             }
 
             //Kiem tra xem san pham exisgingItem co trong Item khong
-            var exisgingItem = await _cartItemRepository.GetByCartAndProductAsync(cart.Id, item.ProductId);
+            var existingItem = await _cartItemRepository.GetByCartAndProductAsync(cart.Id, item.ProductId);
             //neu san pham co trong gio hang
-            if(exisgingItem !=  null)
+            if(existingItem !=  null)
             {
                 //tang so luong san pham
-                exisgingItem.Quantity += item.Quantity;
+                existingItem.Quantity += item.Quantity;
                 //Cap nhat lai item
-                await _cartItemRepository.UpdateAsync(exisgingItem);
+                await _cartItemRepository.UpdateAsync(existingItem);
             }
             //Neu san pham khong co trong gio hang
             else
@@ -84,6 +84,7 @@ namespace BackEndForFashion.Application.Services
                 await _cartRepository.AddAsync(cart);
                 cart = await _cartRepository.GetActiveCartByUserIdAsync(UserId);
             }
+            
             var cartVM = _mapper.Map<CartVM>(cart); 
             if(cartVM == null)
             {

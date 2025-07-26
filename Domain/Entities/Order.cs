@@ -28,6 +28,9 @@ namespace BackEndForFashion.Domain.Entities
         // tong gia tri don hang
         public decimal TotalAmount { get; set; }
         public string ShippingAddress { get; set; }
+        public string ContactName { get; set; }
+        public string ContactEmail { get; set; }
+        public string ContactPhoneNumber { get; set; }
         //trang thai don hang
         public Status? Status { get; set; }
         public DateTime CreatedAt { get; set; }

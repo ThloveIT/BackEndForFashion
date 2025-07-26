@@ -13,6 +13,8 @@ namespace BackEndForFashion.Infrastructure.Repositories
         {
             return await _context.Products
                 .Where(p => p.CategoryId == CategoryId)
+                .Include(p => p.ProductImages)
+                .Include(p => p.Category)
                 .ToListAsync();
         }
 
@@ -56,6 +58,14 @@ namespace BackEndForFashion.Infrastructure.Repositories
                 .Where(p=>p.ProductName.Contains(keyword) || p.Description.Contains(keyword))
                 .Include(p=>p.ProductImages)
                 .Include(p=>p.Category)
+                .ToListAsync();
+        }
+
+        public override async Task<IEnumerable<Product>> GetAllAsync()
+        {
+            return await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.Category)
                 .ToListAsync();
         }
 

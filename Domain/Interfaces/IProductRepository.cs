@@ -10,5 +10,8 @@ namespace BackEndForFashion.Domain.Interfaces
         Task<IEnumerable<Product>> GetFeaturedAsync();
         Task<IEnumerable<Product>> GetPopularAsync();
         Task<IEnumerable<Product>> GetNewAsync();
+        Task<Product> GetByIdAsync(Guid Id);
+        Task<IEnumerable<Product>> GetAllAsync();
+
     }
 }

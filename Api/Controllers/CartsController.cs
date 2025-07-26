@@ -31,6 +31,10 @@ namespace BackEndForFashion.Api.Controllers
         [HttpPost("item")]
         public async Task<IActionResult> AddItem([FromBody]CartItemVM item)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Trả về chi tiết lỗi validation
+            }
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);

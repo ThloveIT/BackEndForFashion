@@ -204,8 +204,8 @@ namespace BackEndForFashion.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Amount).IsRequired().HasColumnType("decimal(18,2)");
-                entity.Property(e => e.PaymentMethod).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.Status).HasMaxLength(500);
+                entity.Property(e => e.PaymentMethod).IsRequired().HasConversion<int>(); // Ánh xạ enum thành int
+                entity.Property(e => e.Status).HasConversion<int>(); // Ánh xạ enum Status thành int
                 entity.Property(e => e.CreatedAt).IsRequired();
                 //quan he
                 entity.HasOne(e => e.Order)
